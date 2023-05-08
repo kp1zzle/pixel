@@ -13,7 +13,7 @@ Main benefits of this boilerplate over the p5 web editor or a simple local set u
 2. Name the repository whatever you want and __make sure to check the `Include all branches` checkbox.__ Hit `Create repository from template` to create your new repo.
 3. Clone your newly created repo to your local machine. (`git clone <your-repo-url>`)
 4. In the terminal, `cd` into your newly cloned repo and run `npm run start` to start the dev server. 
-5. Edit `index.js` using any IDE or text editor you like. Every time you save the dev server will automatically refresh so you can see your changes live. 
+5. Edit `index.ts` using any IDE or text editor you like. Every time you save the dev server will automatically refresh so you can see your changes live. 
 6. When you're happy with your sketch, commit your changes to the `main` branch and push them to GitHub. Your sketch will be automatically built and deployed to GitHub pages and will be live on the internet at `https://<your-username>.github.io/<repo-name>`
 
 ## Extra Features
