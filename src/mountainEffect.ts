@@ -8,8 +8,9 @@ export class mountainEffect implements areaEffect {
     originY: number;
     topColor: string;
     bottomColor: string;
+    timeMultiplier: number;
 
-    constructor(x: number, y: number, height: number, width: number, topColor: string, bottomColor: string) {
+    constructor(x: number, y: number, height: number, width: number, topColor: string, bottomColor: string, timeMultiplier?: number) {
         this.originX = x
         this.originY = y
         this.height = height
@@ -17,11 +18,15 @@ export class mountainEffect implements areaEffect {
         this.cutoff = Array(width)
         this.topColor = topColor
         this.bottomColor = bottomColor
+        this.timeMultiplier = 1
+        if (typeof timeMultiplier !== 'undefined') {
+            this.timeMultiplier = timeMultiplier
+        }
     }
 
     calculateFrameForTime(t: number, noise: (x: number, y?: number, z?: number) => number): void {
         for (let x = 0; x < this.width; x++) {
-            (this.cutoff)[x] = noise(x / 5 + t) * this.height
+            (this.cutoff)[x] = noise(x / 5 + (t*this.timeMultiplier)) * this.height
         }
     }
 
