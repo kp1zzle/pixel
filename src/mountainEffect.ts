@@ -6,12 +6,12 @@ export class mountainEffect implements areaEffect {
     cutoff: number[];
     originX: number;
     originY: number;
-    topColor: string;
-    bottomColor: string;
+    topColor: p5.Color;
+    bottomColor: p5.Color;
     timeMultiplier: number;
     rotate90: boolean;
 
-    constructor(x: number, y: number, height: number, width: number, topColor: string, bottomColor: string, timeMultiplier?: number, rotate90?: boolean) {
+    constructor(x: number, y: number, height: number, width: number, topColor: p5.Color, bottomColor: p5.Color, timeMultiplier?: number, rotate90?: boolean) {
         this.originX = x
         this.originY = y
         this.height = height
@@ -40,7 +40,7 @@ export class mountainEffect implements areaEffect {
         }
     }
 
-    pixelColor(x: number, y: number): string | null {
+    pixelColor(x: number, y: number): p5.Color | null {
         if (x - this.originX < 0 || x - (this.originX + this.width) >= 0 ||
             y - this.originY < 0 || y - (this.originY + this.height) > 0) {
             return null
