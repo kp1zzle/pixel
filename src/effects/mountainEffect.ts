@@ -1,4 +1,4 @@
-import {areaEffect} from "./areaEffect";
+import {areaEffect} from "../types/areaEffect";
 
 export class mountainEffect implements areaEffect {
     height: number;
