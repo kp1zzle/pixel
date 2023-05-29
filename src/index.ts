@@ -3,12 +3,14 @@ import {areaEffect} from "./types/areaEffect";
 import {manualOne, stackedMountainGenerator} from "./effectGenerators";
 import {bouncingRect} from "./effects/bouncingRect";
 import {Coordinate} from "./types/coordinate";
+import {CachedNoise} from "./types/cachedNoise";
 
 let sketch = (s: P5) => {
     const COLUMNS_AND_ROWS = 256;
     const CANVAS_SIZE = 600
     let t = 0;
     let globalTimeMultiplier = 0.5
+    let noiseCache: CachedNoise
     let effects: areaEffect[] = [
         new bouncingRect(
             10,
@@ -74,6 +76,7 @@ let sketch = (s: P5) => {
         s.background(220);
         s.pixelDensity(1)
         s.noSmooth()
+        noiseCache = new CachedNoise(s.noise)
         // effects = stackedMountainGenerator(s)
         // effects.push(...manualOne(s))
         effects.push(...stackedMountainGenerator(s))
@@ -84,7 +87,8 @@ let sketch = (s: P5) => {
         s.background(255)
 
         for (let effect of effects) {
-            effect.calculateFrameForTime(t, s.noise)
+            effect.calculateFrameForTime(t, noiseCache.getNoiseFn())
+            // effect.calculateFrameForTime(t, s.noise)
         }
 
         let img = s.createImage(COLUMNS_AND_ROWS, COLUMNS_AND_ROWS)
@@ -105,7 +109,7 @@ let sketch = (s: P5) => {
         if (s.frameRate() !== 0) {
             t += 1/s.frameRate() * globalTimeMultiplier
             if (frameRateVisible) {
-                s.fill(0)
+                s.fill(255)
                 s.text(s.frameRate().toFixed(0), 10, 10)
             }
         }
