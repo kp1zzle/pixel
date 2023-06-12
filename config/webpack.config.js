@@ -6,6 +6,7 @@ module.exports = {
   entry: "./src/index.ts",
   output: {
     path: path.resolve(__dirname, "../dist"),
+    publicPath: "auto",
     filename: "bundle.js",
     clean: true
   },
@@ -17,7 +18,7 @@ module.exports = {
       {
         test: /\.(glsl|vs|fs|vert|frag)$/i,
         exclude: /node_modules/,
-        use: 'raw-loader',
+        use: '@davcri/webpack-glsl-loader',
       },
       {
         test: /\.ts?$/,

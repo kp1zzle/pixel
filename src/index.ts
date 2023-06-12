@@ -1,116 +1,78 @@
 import * as P5 from 'p5';
-import {areaEffect} from "./types/areaEffect";
-import {manualOne, stackedMountainGenerator} from "./effectGenerators";
-import {bouncingRect} from "./effects/bouncingRect";
+import {effect, mountain, bouncingRect} from "./types/effects";
 import {Coordinate} from "./types/coordinate";
-import {CachedNoise} from "./types/cachedNoise";
+
 
 let sketch = (s: P5) => {
-    const COLUMNS_AND_ROWS = 256;
-    const CANVAS_SIZE = 600
+    const COLUMNS_AND_ROWS = 200;
+    let PIXEL_WIDTH = 10;
     let t = 0;
-    let globalTimeMultiplier = 0.5
-    let noiseCache: CachedNoise
-    let effects: areaEffect[] = [
-        new bouncingRect(
-            10,
-            10,
-            new Coordinate(
-                COLUMNS_AND_ROWS/2,
-                10
-            ),
-            new Coordinate(
-                COLUMNS_AND_ROWS/2,
-                COLUMNS_AND_ROWS - 10
-            ),
-            s.color('#000000'),
-            4,
-        ),
-        new bouncingRect(
-            10,
-            10,
-            new Coordinate(
-                COLUMNS_AND_ROWS/2,
-                COLUMNS_AND_ROWS - 10
-            ),
-            new Coordinate(
-                COLUMNS_AND_ROWS/2,
-                10
-            ),
-            s.color('#000000'),
-            4,
-        ),
-        new bouncingRect(
-            10,
-            10,
-            new Coordinate(
-                COLUMNS_AND_ROWS - 10,
-                COLUMNS_AND_ROWS/2,
-            ),
-            new Coordinate(
-                10,
-                COLUMNS_AND_ROWS/2,
-            ),
-            s.color('#000000'),
-            4,
-        ),
-        new bouncingRect(
-            10,
-            10,
-            new Coordinate(
-                10,
-                COLUMNS_AND_ROWS/2,
-            ),
-            new Coordinate(
-                COLUMNS_AND_ROWS - 10,
-                COLUMNS_AND_ROWS/2,
-            ),
-            s.color('#000000'),
-            4,
-        ),
+    let globalTimeMultiplier = 0.4
+    let effects: effect[] = [
+        // new mountain(15, 0, 40, 30),
+        new mountain(100, 5, 10, 200, s.color("#0c0eef")),
+        new mountain(100, 10, 30, 200, s.color("#747474")),
+        new mountain(100, 100, 200, 200),
+        new bouncingRect(0, 0, 10, 10, new Coordinate(200, 200), 2),
+        new bouncingRect(0, 0, 10, 10, new Coordinate(200, 200), 1),
+        new bouncingRect(200, 0, 10, 10, new Coordinate(0, 200), 3),
+        new bouncingRect(200, 0, 10, 10, new Coordinate(0, 200), 5),
     ]
+    let shader: P5.Shader = null
     let frameRateVisible = true;
+    let lastFrameRateEmission = 0;
 
     s.setup = () => {
-        s.createCanvas(CANVAS_SIZE, CANVAS_SIZE)
+        PIXEL_WIDTH = s.min( window.innerWidth/COLUMNS_AND_ROWS, window.innerHeight/COLUMNS_AND_ROWS)
+        s.createCanvas(PIXEL_WIDTH*COLUMNS_AND_ROWS, PIXEL_WIDTH*COLUMNS_AND_ROWS, s.WEBGL)
         s.background(220);
-        s.pixelDensity(1)
         s.noSmooth()
-        noiseCache = new CachedNoise(s.noise)
-        // effects = stackedMountainGenerator(s)
-        // effects.push(...manualOne(s))
-        effects.push(...stackedMountainGenerator(s))
+        shader = s.createShader(require("./shaders/shader.vert"), require("./shaders/shader.frag"))
+        // s.pixelDensity(1)
+        s.noSmooth()
     }
 
     s.draw = () => {
         s.noStroke()
         s.background(255)
 
+        shader.setUniform('u_time', t)
+        shader.setUniform('u_resolution', [COLUMNS_AND_ROWS, COLUMNS_AND_ROWS])
+
+        let types = []
+        let centers = []
+        let dimensions = []
+        let colors = []
+        let settings = []
+
         for (let effect of effects) {
-            effect.calculateFrameForTime(t, noiseCache.getNoiseFn())
-            // effect.calculateFrameForTime(t, s.noise)
+            effect.setEffectStateForTime(t)
+            types.push(effect.type)
+            centers.push(effect.x, effect.y)
+            dimensions.push(effect.width, effect.height)
+            if (effect.color !== null) {
+                colors.push(s.red(effect.color)/255, s.green(effect.color)/255, s.blue(effect.color)/255, s.alpha(effect.color)/255)
+            } else {
+                colors.push(0, 0, 0, 0)
+            }
+
+            settings.push(effect.settings[0], effect.settings[1], effect.settings[2], effect.settings[3])
         }
 
-        let img = s.createImage(COLUMNS_AND_ROWS, COLUMNS_AND_ROWS)
-        for (let column = 0; column < COLUMNS_AND_ROWS; column++) {
-            for (let row = 0; row < COLUMNS_AND_ROWS; row++) {
-                for (let effect of effects) {
-                    let color = effect.pixelColor(column, row)
-                    if (color != null) {
-                        img.set(column, row, color)
-                        break;
-                    }
-                }
-            }
-        }
-        img.updatePixels()
-        s.image(img, 0, 0, CANVAS_SIZE, CANVAS_SIZE)
+        shader.setUniform('u_effectTypes', types)
+        shader.setUniform('u_effectCenters', centers)
+        shader.setUniform('u_effectDimensions', dimensions)
+        shader.setUniform('u_effectColors', colors)
+        shader.setUniform('u_effectSettings', settings)
+
+        s.shader(shader)
+        s.rect(0-s.width/2, 0-s.height/2, s.width, s.height)
 
         if (s.frameRate() !== 0) {
             t += 1/s.frameRate() * globalTimeMultiplier
-            if (frameRateVisible) {
-                s.fill(255)
-                s.text(s.frameRate().toFixed(0), 10, 10)
+            if (frameRateVisible && Date.now() - lastFrameRateEmission > 1000) {
+                console.log(s.frameRate().toFixed(0))
+                lastFrameRateEmission = Date.now()
             }
         }
     }
