@@ -27,6 +27,14 @@ bool isWithinDims(vec2 largePixelCoords, vec2 center, vec2 dims) {
     return false;
 }
 
+vec4 fillMode(vec4 color) {
+    if (color != vec4(0)) {
+        return color;
+    } else {
+        return vec4(1. - vTexCoord.x + sin(u_time*2.), 1. - vTexCoord.x + sin(u_time*3.), 1. - vTexCoord.x + sin(u_time*4.), 1.);
+    }
+}
+
 vec4 mountain(vec2 largePixelCoords, vec2 center, vec2 dims, vec4 color, vec4 settings) {
     if (!isWithinDims(largePixelCoords, center, dims)) {
         return vec4(0,0,0,0);
@@ -39,11 +47,7 @@ vec4 mountain(vec2 largePixelCoords, vec2 center, vec2 dims, vec4 color, vec4 se
     } else {
         //        gl_FragColor = vec4(1. - (largePixelCoords.x / u_resolution.x), 1.- (largePixelCoords.y / u_resolution.y), u_time/10.,1);
 //        return vec4(1. - vTexCoord.x + sin(u_time*2.), 1. - vTexCoord.x + sin(u_time*3.), 1. - vTexCoord.x + sin(u_time*4.), 1.);
-        if (color != vec4(0)) {
-            return color;
-        } else {
-            return vec4(1. - vTexCoord.x + sin(u_time*2.), 1. - vTexCoord.x + sin(u_time*3.), 1. - vTexCoord.x + sin(u_time*4.), 1.);
-        }
+        return fillMode(color);
 
     }
 }
@@ -71,6 +75,15 @@ vec4 rect(vec2 largePixelCoords, vec2 center, vec2 dims) {
     }
 }
 
+vec4 circle(vec2 largePixelCoords, vec2 center, vec2 dims, vec4 color) {
+    largePixelCoords += 0.5;
+    float dist = distance(largePixelCoords, center);
+    if (dist <= dims.x/2.) {
+        return fillMode(color);
+    } else {
+        return vec4(0,0,0,0);
+    }
+}
 
 
 void main() {
@@ -81,6 +94,8 @@ void main() {
             color = mountain(largePixelCoords, u_effectCenters[i], u_effectDimensions[i], u_effectColors[i], u_effectSettings[i]);
         } else if (u_effectTypes[i] == 2) {
             color = rect(largePixelCoords, u_effectCenters[i], u_effectDimensions[i]);
+        } else if (u_effectTypes[i] == 3) {
+            color = circle(largePixelCoords, u_effectCenters[i], u_effectDimensions[i], u_effectColors[i]);
         } else {
             color = vec4(0,0,0,0);
         }

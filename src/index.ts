@@ -1,5 +1,5 @@
 import * as P5 from 'p5';
-import {effect, mountain, bouncingRect} from "./types/effects";
+import {effect, mountain, bouncingRect, circle} from "./types/effects";
 import {Coordinate} from "./types/coordinate";
 
 
@@ -9,14 +9,7 @@ let sketch = (s: P5) => {
     let t = 0;
     let globalTimeMultiplier = 0.4
     let effects: effect[] = [
-        // new mountain(15, 0, 40, 30),
-        new mountain(100, 5, 10, 200, s.color("#0c0eef")),
-        new mountain(100, 10, 30, 200, s.color("#747474")),
-        new mountain(100, 100, 200, 200),
-        new bouncingRect(0, 0, 10, 10, new Coordinate(200, 200), 2),
-        new bouncingRect(0, 0, 10, 10, new Coordinate(200, 200), 1),
-        new bouncingRect(200, 0, 10, 10, new Coordinate(0, 200), 3),
-        new bouncingRect(200, 0, 10, 10, new Coordinate(0, 200), 5),
+        new circle(100, 100, 100, 20, s.color("#5d0707"))
     ]
     let shader: P5.Shader = null
     let frameRateVisible = true;
