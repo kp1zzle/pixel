@@ -1,16 +1,16 @@
 import * as P5 from 'p5';
-import {effect, mountain, bouncingRect, circle, stars} from "./types/effects";
+import {effect, mountain, bouncingRect, circle, stars, rect} from "./types/effects";
 import {Coordinate} from "./types/coordinate";
 
 
 let sketch = (s: P5) => {
-    const COLUMNS_AND_ROWS = 4;
+    const COLUMNS_AND_ROWS = 32;
     let PIXEL_WIDTH = 10;
     let t = 0;
     let globalTimeMultiplier = 0.4
     let effects: effect[] = [
         new stars(COLUMNS_AND_ROWS/2, COLUMNS_AND_ROWS/2, COLUMNS_AND_ROWS, COLUMNS_AND_ROWS, s.color('#ffffff')),
-        new bouncingRect(COLUMNS_AND_ROWS/2, COLUMNS_AND_ROWS/2, 0.75*COLUMNS_AND_ROWS, 0.75*COLUMNS_AND_ROWS, new Coordinate(COLUMNS_AND_ROWS/2, COLUMNS_AND_ROWS/2),1)
+        new rect(COLUMNS_AND_ROWS/2, COLUMNS_AND_ROWS/2, 0.75*COLUMNS_AND_ROWS, 0.75*COLUMNS_AND_ROWS, s.color('#13c4b4')),
         // new circle(100, 100, 100, 20),
         // new mountain(100, 150, 200, 200, ),
         // new mountain(100, 150, 180, 200, s.color('#000000')),

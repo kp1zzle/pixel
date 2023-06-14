@@ -53,7 +53,7 @@ vec4 mountain(vec2 largePixelCoords, vec2 center, vec2 dims, vec4 color, vec4 se
     }
 }
 
-vec4 rect(vec2 largePixelCoords, vec2 center, vec2 dims, vec4 color, vec4 settings) {
+vec4 dancingRect(vec2 largePixelCoords, vec2 center, vec2 dims, vec4 color, vec4 settings) {
     if (!isWithinDims(largePixelCoords, center, dims + 2.*settings.x)) {
         return vec4(0,0,0,0);
     }
@@ -74,6 +74,13 @@ vec4 rect(vec2 largePixelCoords, vec2 center, vec2 dims, vec4 color, vec4 settin
         return vec4(0,0,0,0);
 
     }
+}
+
+vec4 rect(vec2 largePixelCoords, vec2 center, vec2 dims, vec4 color) {
+    if (!isWithinDims(largePixelCoords, center, dims)) {
+        return vec4(0,0,0,0);
+    }
+        return fillMode(color);
 }
 
 vec4 circle(vec2 largePixelCoords, vec2 center, vec2 dims, vec4 color) {
@@ -115,12 +122,14 @@ void main() {
         if (u_effectTypes[i] == 1) {
             color = mountain(largePixelCoords, u_effectCenters[i], u_effectDimensions[i], u_effectColors[i], u_effectSettings[i]);
         } else if (u_effectTypes[i] == 2) {
-            color = rect(largePixelCoords, u_effectCenters[i], u_effectDimensions[i], u_effectColors[i], u_effectSettings[i]);
+            color = rect(largePixelCoords, u_effectCenters[i], u_effectDimensions[i], u_effectColors[i]);
         } else if (u_effectTypes[i] == 3) {
             color = circle(largePixelCoords, u_effectCenters[i], u_effectDimensions[i], u_effectColors[i]);
         } else if (u_effectTypes[i] == 4) {
             color = stars(largePixelCoords, u_effectCenters[i], u_effectDimensions[i], u_effectColors[i]);
-        } else {
+        } else if (u_effectTypes[i] == 5) {
+            color = dancingRect(largePixelCoords, u_effectCenters[i], u_effectDimensions[i], u_effectColors[i], u_effectSettings[i]);
+        }else {
             color = vec4(0,0,0,0);
         }
         gl_FragColor = lerpBlend(color, gl_FragColor);
