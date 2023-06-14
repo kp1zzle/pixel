@@ -77,7 +77,7 @@ export class bouncingRect implements effect {
         this.secsPerOscillation = secsPerOscillation
         this.direction = 1
         this.color = null
-        this.settings = [Math.random(), Math.random(), Math.random(), Math.random()]
+        this.settings = [Math.random()* 10, Math.random() * 2, Math.random()* 5, Math.random()* 5]
     }
 
     smoothstep(edge0: number, edge1: number, x: number): number {

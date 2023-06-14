@@ -53,21 +53,21 @@ vec4 mountain(vec2 largePixelCoords, vec2 center, vec2 dims, vec4 color, vec4 se
     }
 }
 
-vec4 rect(vec2 largePixelCoords, vec2 center, vec2 dims) {
-    if (!isWithinDims(largePixelCoords, center, dims)) {
+vec4 rect(vec2 largePixelCoords, vec2 center, vec2 dims, vec4 color, vec4 settings) {
+    if (!isWithinDims(largePixelCoords, center, dims + 2.*settings.x)) {
         return vec4(0,0,0,0);
     }
 
      vec4 displacement = vec4(
-        snoise(vec2((largePixelCoords.x - center.x)/20. + u_time*4.,  1)) * 4.,
-        snoise(vec2((largePixelCoords.x - center.x)/20. + u_time*4.,  1)) * 4.,
-        snoise(vec2((largePixelCoords.y - center.y)/20. + u_time*4.,  1)) * 4.,
-        snoise(vec2((largePixelCoords.y - center.y)/20. + u_time*4.,  1)) * 4.
+        snoise(vec2((largePixelCoords.x - center.x)/50. * settings.y + u_time*settings.z,  u_time * settings.a)) * settings.x,
+        snoise(vec2((dims.x/2. + largePixelCoords.y - center.y)/50. * settings.y - u_time*settings.z,  u_time * settings.a)) * settings.x,
+        snoise(vec2((dims.x + largePixelCoords.x - center.x)/50. * settings.y - u_time*settings.z,  u_time * settings.a)) * settings.x,
+        snoise(vec2((dims.x * 1.5 + largePixelCoords.y - center.y)/50. * settings.y + u_time*settings.z,  u_time * settings.a)) * settings.x
      );
 
     if (largePixelCoords.y < center.y + dims.y/2. - displacement.x &&
-    largePixelCoords.y > center.y - dims.y/2. + displacement.y &&
-    largePixelCoords.x < center.x + dims.x/2. - displacement.z &&
+    largePixelCoords.x < center.x + dims.x/2. - displacement.y&&
+    largePixelCoords.y > center.y - dims.y/2. + displacement.z &&
     largePixelCoords.x > center.x - dims.x/2. + displacement.a) {
         return vec4(0.9*sin(u_time*2.) , 0, 0.9, 1);
     } else {
@@ -115,7 +115,7 @@ void main() {
         if (u_effectTypes[i] == 1) {
             color = mountain(largePixelCoords, u_effectCenters[i], u_effectDimensions[i], u_effectColors[i], u_effectSettings[i]);
         } else if (u_effectTypes[i] == 2) {
-            color = rect(largePixelCoords, u_effectCenters[i], u_effectDimensions[i]);
+            color = rect(largePixelCoords, u_effectCenters[i], u_effectDimensions[i], u_effectColors[i], u_effectSettings[i]);
         } else if (u_effectTypes[i] == 3) {
             color = circle(largePixelCoords, u_effectCenters[i], u_effectDimensions[i], u_effectColors[i]);
         } else if (u_effectTypes[i] == 4) {
