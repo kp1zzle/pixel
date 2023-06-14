@@ -1,5 +1,6 @@
 precision highp float;
-#include "./lygia/generative/pnoise.glsl"
+#include "./lygia/generative/snoise.glsl"
+#include "./lygia/generative/worley.glsl"
 
 #define MAX_EFFECTS 10
 
@@ -40,7 +41,7 @@ vec4 mountain(vec2 largePixelCoords, vec2 center, vec2 dims, vec4 color, vec4 se
         return vec4(0,0,0,0);
     }
 
-    float cutoff = (pnoise(vec2(largePixelCoords.x/11. + u_time/2.,  u_time*settings.x), vec2(200,200)) * dims.y) + dims.y/2.;
+    float cutoff = ((snoise(vec2(largePixelCoords.x/50.*settings.z + u_time/2.*settings.x,  u_time*settings.y)))/2. * dims.y);
     if (largePixelCoords.y < cutoff + center.y) {
         return vec4(0,0,0,0);
 
@@ -58,10 +59,10 @@ vec4 rect(vec2 largePixelCoords, vec2 center, vec2 dims) {
     }
 
      vec4 displacement = vec4(
-        pnoise(vec2((largePixelCoords.x - center.x)/20. + u_time*4.,  1), vec2(200,200)) * 4.,
-        pnoise(vec2((largePixelCoords.x - center.x)/20. + u_time*4.,  1), vec2(40,344)) * 4.,
-        pnoise(vec2((largePixelCoords.y - center.y)/20. + u_time*4.,  1), vec2(232,190)) * 4.,
-        pnoise(vec2((largePixelCoords.y - center.y)/20. + u_time*4.,  1), vec2(200,200)) * 4.
+        snoise(vec2((largePixelCoords.x - center.x)/20. + u_time*4.,  1)) * 4.,
+        snoise(vec2((largePixelCoords.x - center.x)/20. + u_time*4.,  1)) * 4.,
+        snoise(vec2((largePixelCoords.y - center.y)/20. + u_time*4.,  1)) * 4.,
+        snoise(vec2((largePixelCoords.y - center.y)/20. + u_time*4.,  1)) * 4.
      );
 
     if (largePixelCoords.y < center.y + dims.y/2. - displacement.x &&
@@ -85,6 +86,27 @@ vec4 circle(vec2 largePixelCoords, vec2 center, vec2 dims, vec4 color) {
     }
 }
 
+vec4 grid(vec2 largePixelCoords, vec2 center, vec2 dims, vec4 color) {
+    float v = 10.;
+    largePixelCoords += v/2.;
+    if (mod(largePixelCoords.x, v) == 0. && mod(largePixelCoords.y, v) == 0.) {
+        return fillMode(color);
+    } else {
+        return vec4(0,0,0,0);
+    }
+}
+
+vec4 stars(vec2 largePixelCoords, vec2 center, vec2 dims, vec4 color) {
+    float v = worley(largePixelCoords);
+    if (v >= 0.9 + sin(u_time)*0.01) {
+        return fillMode(color);
+    } else {
+        return vec4(0,0,0,0);
+
+    }
+}
+
+
 
 void main() {
     vec2 largePixelCoords = floor(vTexCoord * u_resolution);
@@ -96,6 +118,8 @@ void main() {
             color = rect(largePixelCoords, u_effectCenters[i], u_effectDimensions[i]);
         } else if (u_effectTypes[i] == 3) {
             color = circle(largePixelCoords, u_effectCenters[i], u_effectDimensions[i], u_effectColors[i]);
+        } else if (u_effectTypes[i] == 4) {
+            color = stars(largePixelCoords, u_effectCenters[i], u_effectDimensions[i], u_effectColors[i]);
         } else {
             color = vec4(0,0,0,0);
         }

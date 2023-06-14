@@ -19,6 +19,7 @@ export enum effectIdentifier {
     Mountain,
     DancingRect,
     Circle,
+    Stars   ,
 }
 
 export class mountain implements effect {
@@ -99,6 +100,34 @@ export class bouncingRect implements effect {
 
 export class circle implements effect {
     type = effectIdentifier.Circle;
+    x: number;
+    y: number;
+    height: number;
+    width: number;
+    color: p5.Color | null;
+    settings: [number, number, number, number];
+
+    constructor(x: number, y: number, height: number, width: number, color?: p5.Color, timeMultiplier?: number) {
+        this.x = x
+        this.y = y
+        this.height = height
+        this.width = width
+        if (typeof color !== 'undefined') {
+            this.color = color
+        } else {
+            this.color = null
+        }
+        this.settings = [Math.random(), Math.random(), Math.random(), Math.random()]
+
+    }
+
+    setEffectStateForTime(t: number): void {
+        return
+    }
+}
+
+export class stars implements effect {
+    type = effectIdentifier.Stars;
     x: number;
     y: number;
     height: number;
